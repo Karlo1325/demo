@@ -46,7 +46,7 @@ document.querySelector('.check').addEventListener('click', function () {
     // when guess is too low
   } else if (guess < secretNumber) {
     if (scoreNumber > 1) {
-      document.querySelector('.message').textContent = '📉 Pre mali broj!';
+      document.querySelector('.message').textContent = '📉 Premali broj!';
       scoreNumber--;
       document.querySelector('.score').textContent = scoreNumber;
     } else {
@@ -57,7 +57,7 @@ document.querySelector('.check').addEventListener('click', function () {
     // when guess is too high
   } else if (guess > secretNumber) {
     if (scoreNumber > 1) {
-      document.querySelector('.message').textContent = '📈 Pre veliki broj!';
+      document.querySelector('.message').textContent = '📈 Preveliki broj!';
       scoreNumber--;
       document.querySelector('.score').textContent = scoreNumber;
     } else {
