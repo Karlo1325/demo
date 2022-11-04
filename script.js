@@ -1,68 +1,122 @@
 'use strict';
 
-/* console.log(document.querySelector('.message').textContent);
+// selecting elements
+const player0El = document.querySelector('.player--0')
+const player1El = document.querySelector('.player--1')
+const score0El = document.querySelector('#score--0');
+const score1El = document.getElementById('score--1');
+const current0El = document.getElementById('current--0');
+const current1El = document.getElementById('current--1');
 
-document.querySelector('.message').textContent = '🎉 TOČAN BROJ!';
+// buttons
+const btnNew = document.querySelector('.btn--new');
+const btnRoll = document.querySelector('.btn--roll');
+const btnHold = document.querySelector('.btn--hold');
+const diceEl = document.querySelector('.dice');
 
-document.querySelector('.number').textContent = 13;
-document.querySelector('.score').textContent = 20;
+const playerWinner = function() {
+  document.querySelector(`.player--${activePlayer}`).classList.add('player--winner');
+  document.querySelector(`.player--${activePlayer}`).classList.remove('player--active');
+  document.getElementById(`name--${activePlayer}`).textContent = `WINNER`;
+  diceEl.classList.add('hidden');
+}
 
-document.querySelector('.guess').value = 23;
-console.log(document.querySelector('.guess').value); */
+const scores = [0, 0];
+let currentScore = 0;
+let activePlayer = 0;
+let playing = true;
+//console.log(activePlayer);
 
-let scoreNumber = 20;
-let highscore = 0;
-let secretNumber = Math.trunc(Math.random() * 20) + 1;
 
-document.querySelector('.again').addEventListener('click', function () {
-  document.querySelector('.message').textContent = 'Počni pogađati...';
-  document.querySelector('.number').textContent = '?';
-  document.querySelector('body').style.backgroundColor = '#222';
-  document.querySelector('.number').style.width = '15rem';
-  document.querySelector('.guess').value = '';
-  document.querySelector('.score').textContent = scoreNumber = 20;
-  secretNumber = Math.trunc(Math.random() * 20) + 1;
+// switch player funkcija
+const switchPlayer = function() {
+  document.getElementById(`current--${activePlayer}`).textContent = 0;
+  currentScore = 0;
+  activePlayer = activePlayer === 0 ? 1 : 0;
+  // css switch
+  player0El.classList.toggle('player--active');
+  player1El.classList.toggle('player--active');
+}
+
+const resetScores = function() {
+  for (let i = 0; i < scores.length; i++) {
+    scores[i] = 0;
+  }return scores;
+}
+
+
+const startingConditions = function () {
+  playing = true;
+  score0El.textContent = '0';
+  score1El.textContent = '0';
+  activePlayer = 0;
+  currentScore = 0;
+  current0El.textContent = 0;
+  current1El.textContent = 0;
+  document.querySelector(`.player--${activePlayer}`).classList.add('player--active');
+};
+
+const resset = function() {
+  document.querySelector(`.player--1`).classList.remove('player--active');
+  document.querySelector(`.player--${activePlayer}`).classList.remove('player--winner');
+  document.getElementById(`name--0`).textContent = `PLAYER 1`;
+  document.getElementById(`name--1`).textContent = `PLAYER 2`;
+  diceEl.classList.add('hidden');
+  resetScores();
+}
+
+// starting conditions
+startingConditions();
+diceEl.classList.add('hidden');
+
+// roll a dice functionality
+btnRoll.addEventListener('click', function () {
+  if (playing) {
+  
+    //1. generating a random dice roll
+    const rollDice = Math.trunc(Math.random() * 6) + 1;
+  
+    //2. display the dice
+    diceEl.classList.remove('hidden');
+    diceEl.src = `dice-${rollDice}.png`;
+
+    if (rollDice !== 1) {
+      // add dice to current score
+      currentScore += rollDice;
+      document.getElementById(`current--${activePlayer}`).textContent = currentScore;
+    
+    } else {
+      // switch to the next player
+      switchPlayer();
+  }
+  }
 });
 
-document.querySelector('.check').addEventListener('click', function () {
-  const guess = Number(document.querySelector('.guess').value);
-  console.log(guess);
+  // za hold button
+btnHold.addEventListener('click', function() {
+  if (playing) {
+    // 1. add current score to active player's score
+    scores[activePlayer] += currentScore;
+    // score[1] = scores[1] + currentScore
 
-  // when there is no input
-  if (!guess) {
-    document.querySelector('.message').textContent = '⛔ Nema broja';
-
-    // when player wins
-  } else if (guess === secretNumber) {
-    document.querySelector('.message').textContent = '🎉 TOČAN BROJ!';
-    document.querySelector('.number').textContent = secretNumber;
-    document.querySelector('body').style.backgroundColor = '#60b347';
-    document.querySelector('.number').style.width = '30rem';
-    document.querySelector('.highscore').textContent =
-      scoreNumber > highscore
-        ? (highscore = scoreNumber)
-        : (highscore = highscore);
-
-    // when guess is too low
-  } else if (guess < secretNumber) {
-    if (scoreNumber > 1) {
-      document.querySelector('.message').textContent = '📉 Premali broj!';
-      scoreNumber--;
-      document.querySelector('.score').textContent = scoreNumber;
+    document.getElementById(`score--${activePlayer}`).textContent = scores[activePlayer];
+  
+    // 2. check if player's score is >= 100
+    if (scores[activePlayer] >= 20) {
+      // finish the game
+      playing = false;
+      playerWinner();
+    
     } else {
-      document.querySelector('.message').textContent = '🥲 Izgubio si!';
-      document.querySelector('.score').textContent = 0;
-    }
-
-    // when guess is too high
-  } else if (guess > secretNumber) {
-    if (scoreNumber > 1) {
-      document.querySelector('.message').textContent = '📈 Preveliki broj!';
-      scoreNumber--;
-      document.querySelector('.score').textContent = scoreNumber;
-    } else {
-      document.querySelector('.message').textContent = '🥲 Izgubio si!';
-      document.querySelector('.score').textContent = 0;
+      // switch to the next player
+      switchPlayer();
     }
   }
+});
+
+// new game button
+btnNew.addEventListener('click', function() {
+  resset();
+  startingConditions();  
+  
 });
